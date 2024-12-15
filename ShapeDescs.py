@@ -30,6 +30,10 @@ def _getimages(datapath, ext = '.bmp'):
 
 # Hu moments
 class HuMoments():
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    '''
     def __init__(self, datapath) -> None:
         self.datapath = datapath
         pass
@@ -49,6 +53,12 @@ class HuMoments():
 
 # Zernike moments
 class ZernikeMoments():
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    Degree : integer, optional
+        Maximum degree to use (default: 8)
+    '''
     def __init__(self, datapath, degree= 8) -> None:
         self.datapath = datapath
         self.degree = degree
@@ -103,6 +113,14 @@ class ZernikeMoments():
 
 # Shift Invariant Feature Transformation
 class SIFT():
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    k : integer, optional
+        Size of global SIFT descriptor (default: 16)
+    kmeans_iter : integer, optional
+        Number of iterations for kmeans used for clustering local SIFT desicriptors (default: 10).
+    '''
     def __init__(self, datapath, k = 16, kmeans_iter = 10) -> None:
         self.datapath = datapath
         self.k = k
@@ -139,6 +157,12 @@ class SIFT():
 
 # Elliptic Fourier Descriptors
 class EllipticFourierDesc():
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    order : integer, optional
+        The order of Fourier coefficients to calculate (default: 25)
+    '''
     def __init__(self, datapath, order = 25) -> None:
         self.datapath = datapath
         self.order = order
@@ -173,9 +197,15 @@ class EllipticFourierDesc():
 
 # Fourier Descriptors
 class FourierDescriptor():
-    def __init__(self, datapath, num_pair) -> None:
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    num_pairs : integer, optional
+        The number of pair of Fourier coefficients to calculate (default: 20)
+    '''
+    def __init__(self, datapath, num_pairs = 20) -> None:
         self.datapath = datapath
-        self.num_pairs = num_pair
+        self.num_pairs = num_pairs
 
     def get_contour(self, img):
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -258,7 +288,11 @@ class FourierDescriptor():
 
 # Shape Context
 class ShapeContext(object):
-
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    ...
+    '''
     def __init__(self, datapath, n_contour_points = 100, nbins_r=5, nbins_theta=12, r_inner=0.1250, r_outer=2.0):
         self.datapath = datapath
         # number of radius zones
@@ -404,6 +438,15 @@ class ShapeContext(object):
 
 # Centroid Distance function
 class CentroidDist():
+    '''
+    datapath : string
+        path of directory where the image data is stored.
+    n_points : integer, optional
+        number of points to sample on image contour (default: 100)
+    scale_by : 'max' or 'avg'
+        how transform featured to achieve scale invariance. 'max' for scaling with maximum radius. 'avg' for
+        scaling with average radius.
+    '''
     def __init__(self, datapath, n_points = 100, scale_by = 'max') -> None:
         self.datapath = datapath
         self.n_points = n_points

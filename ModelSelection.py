@@ -70,6 +70,9 @@ def select_kmean(data, metric = 'db', n_jobs = -1):
     return opt_k, km_grid_score
 
 def select_models(data, suffix, folders = ['kmeans', 'cpf'], metric = 'db'):
+    '''
+    Returns (k, k1, r) where k is optimal k for kmeans, k1 is optimal k for cpf, r is rho.
+    '''
     # kmeans
     opt_k, _ = select_kmean(data, metric)
     km_model = KMeans(opt_k, n_init='auto')
