@@ -46,7 +46,7 @@ class HuMoments():
         moments = cv2.moments(img)
         return cv2.HuMoments(moments).flatten()
     
-    def get_decs(self):
+    def get_descs(self):
         with Parallel(n_jobs= -1) as parallel:
             self.descs = np.array(parallel(delayed(self.hu)(i) for i in _getimages(self.datapath)))
         pass
