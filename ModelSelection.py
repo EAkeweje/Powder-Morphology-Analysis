@@ -17,8 +17,9 @@ from cpf_core import CPFcluster
 def select_cpf(data, metric = 'db', n_jobs = 20):
     assert metric in ['sil', 'db', 'ch'], 'Unsupported metric'
 
+    n_samples = data.shape[0]
     rhos = np.linspace(0.1, 0.9, 9)
-    ks = [100, 150, 200, 300]
+    ks = (np.array([0.5, 0.7, 0.9, 1.0]) * np.sqrt(n_samples)).astype(int) #recommended K for k-neighbour graph is around square root of sample size
 
     cpf_grid_score = {}
     for k in tqdm(ks):
