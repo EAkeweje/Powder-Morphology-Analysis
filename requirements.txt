@@ -8,5 +8,5 @@ pandas==2.2.0
 pyefd==1.6.0
 scikit_learn==1.5.2
 scipy==1.11.4
-skimage==0.24.0
+scikit-image==0.24.0
 tqdm==4.66.1
