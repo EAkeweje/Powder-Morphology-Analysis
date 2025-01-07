@@ -1,2 +1,2 @@
 # Usage
-Refer to the notebook [Model selection.ipynb](Model_selection.ipynb).
+Refer to the notebook: [Model selection](Model-selection.ipynb).
