@@ -4,9 +4,6 @@ from tqdm import tqdm
 import itertools
 from joblib import Parallel, delayed
 
-from cpf_core import CPFcluster
-
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
@@ -19,7 +16,6 @@ from scipy.cluster.vq import kmeans,vq
 from pyefd import elliptic_fourier_descriptors
 from sklearn.cluster import *
 from sklearn.metrics import silhouette_score
-from sklearn.decomposition import FastICA, PCA
 from scipy.optimize import brent
 from scipy.optimize import linear_sum_assignment
 from scipy.spatial.distance import cdist, cosine
@@ -33,9 +29,12 @@ class HuMoments():
     '''
     datapath : string
         path of directory where the image data is stored.
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     '''
-    def __init__(self, datapath) -> None:
+    def __init__(self, datapath, ext = '.bmp') -> None:
         self.datapath = datapath
+        self.ext = ext
         pass
 
     def hu(self, image):
@@ -48,7 +47,7 @@ class HuMoments():
     
     def get_descs(self):
         with Parallel(n_jobs= -1) as parallel:
-            self.descs = np.array(parallel(delayed(self.hu)(i) for i in _getimages(self.datapath)))
+            self.descs = np.array(parallel(delayed(self.hu)(i) for i in _getimages(self.datapath, self.ext)))
         pass
 
 # Zernike moments
@@ -56,12 +55,15 @@ class ZernikeMoments():
     '''
     datapath : string
         path of directory where the image data is stored.
-    Degree : integer, optional
+    degree : integer, optional
         Maximum degree to use (default: 8)
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc 
     '''
-    def __init__(self, datapath, degree= 8) -> None:
+    def __init__(self, datapath, degree= 8, ext = '.bmp') -> None:
         self.datapath = datapath
         self.degree = degree
+        self.ext = ext
         pass
 
 
@@ -108,7 +110,7 @@ class ZernikeMoments():
     
     def get_descs(self):
         with Parallel(n_jobs= -1) as parallel:
-            self.descs = np.array(parallel(delayed(self._get_descriptors)(i) for i in _getimages(self.datapath)))
+            self.descs = np.array(parallel(delayed(self._get_descriptors)(i) for i in _getimages(self.datapath, self.ext)))
         pass
 
 # Shift Invariant Feature Transformation
@@ -120,11 +122,14 @@ class SIFT():
         Size of global SIFT descriptor (default: 16)
     kmeans_iter : integer, optional
         Number of iterations for kmeans used for clustering local SIFT desicriptors (default: 10).
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     '''
-    def __init__(self, datapath, k = 16, kmeans_iter = 10) -> None:
+    def __init__(self, datapath, k = 16, kmeans_iter = 10, ext = '.bmp') -> None:
         self.datapath = datapath
         self.k = k
         self.km_iter = kmeans_iter
+        self.ext = ext
         pass
 
     def sift_keypoints(self, img_name, n_keys = 0):
@@ -141,12 +146,12 @@ class SIFT():
         with Parallel(n_jobs= -1) as parallel:
             #get code book
             sift_desc_all = parallel(delayed(self.sift_keypoints)(i)
-                                                        for i in tqdm(_getimages(self.datapath), desc= 'Computing local descriptors'))
+                                                        for i in tqdm(_getimages(self.datapath, self.ext), desc= 'Computing local descriptors'))
             sift_desc = list(itertools.filterfalse(lambda item: type(item) != np.ndarray, sift_desc_all))
             sift_desc = np.concatenate(sift_desc)
             self.code, _ = kmeans(sift_desc, self.k, iter= self.km_iter)
 
-        self.descs = np.zeros((len(_getimages(self.datapath)), self.k), "int16")
+        self.descs = np.zeros((len(_getimages(self.datapath, self.ext)), self.k), "int16")
         for i, kps_desc in enumerate(tqdm(sift_desc_all, desc= 'Encoding local keypoint descriptors to form global descriptors')):
             if type(kps_desc) is np.ndarray:
                 kp_cluster, _ = vq(kps_desc, self.code)
@@ -162,10 +167,13 @@ class EllipticFourierDesc():
         path of directory where the image data is stored.
     order : integer, optional
         The order of Fourier coefficients to calculate (default: 25)
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     '''
-    def __init__(self, datapath, order = 25) -> None:
+    def __init__(self, datapath, order = 25, ext = '.bmp') -> None:
         self.datapath = datapath
         self.order = order
+        self.ext = ext
         pass
 
     def get_efd(self, img):
@@ -192,7 +200,7 @@ class EllipticFourierDesc():
     
     def get_descs(self):
         with Parallel(n_jobs= -1) as parallel:
-            self.descs = np.array(parallel(delayed(self._shape_efd)(i) for i in _getimages(self.datapath)))
+            self.descs = np.array(parallel(delayed(self._shape_efd)(i) for i in _getimages(self.datapath, self.ext)))
         pass
 
 # Fourier Descriptors
@@ -202,10 +210,13 @@ class FourierDescriptor():
         path of directory where the image data is stored.
     num_pairs : integer, optional
         The number of pair of Fourier coefficients to calculate (default: 20)
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     '''
-    def __init__(self, datapath, num_pairs = 20) -> None:
+    def __init__(self, datapath, num_pairs = 20, ext = '.bmp') -> None:
         self.datapath = datapath
         self.num_pairs = num_pairs
+        self.ext = ext
 
     def get_contour(self, img):
         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -281,9 +292,9 @@ class FourierDescriptor():
 
         return desc
     
-    def get_descs(self):
+    def get_descs(self, rot_invariant = False, r_only = True):
         with Parallel(n_jobs = -1) as parallel:
-            self.descs = np.array(parallel(delayed(self.compute_desc)(i, False, True) for i in _getimages(self.datapath)))
+            self.descs = np.array(parallel(delayed(self.compute_desc)(i, rot_invariant, r_only) for i in _getimages(self.datapath, self.ext)))
         pass
 
 # Shape Context
@@ -291,9 +302,11 @@ class ShapeContext(object):
     '''
     datapath : string
         path of directory where the image data is stored.
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     ...
     '''
-    def __init__(self, datapath, n_contour_points = 100, nbins_r=5, nbins_theta=12, r_inner=0.1250, r_outer=2.0):
+    def __init__(self, datapath, n_contour_points = 100, nbins_r=5, nbins_theta=12, r_inner=0.1250, r_outer=2.0, ext = '.bmp'):
         self.datapath = datapath
         # number of radius zones
         self.nbins_r = nbins_r
@@ -303,6 +316,7 @@ class ShapeContext(object):
         self.r_inner = r_inner
         self.r_outer = r_outer
         self.n_contour_points = n_contour_points
+        self.ext = ext
 
     def _hungarian(self, cost_matrix):
         """
@@ -430,8 +444,7 @@ class ShapeContext(object):
     
     def get_descs(self):
         with Parallel(n_jobs = 5) as parallel:
-            self.descs = np.array(parallel(delayed(self.compute_description)(i) for i in _getimages(self.datapath)[:5]))
-
+            self.descs = np.array(parallel(delayed(self.compute_description)(i) for i in _getimages(self.datapath, self.ext)[:5]))
             # the implementation of matching cost is not included here.
         pass
 
@@ -446,11 +459,14 @@ class CentroidDist():
     scale_by : 'max' or 'avg'
         how transform featured to achieve scale invariance. 'max' for scaling with maximum radius. 'avg' for
         scaling with average radius.
+    ext : string
+        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
     '''
-    def __init__(self, datapath, n_points = 100, scale_by = 'max') -> None:
+    def __init__(self, datapath, n_points = 100, scale_by = 'max', ext = '.bmp') -> None:
         self.datapath = datapath
         self.n_points = n_points
         self.scale_by = scale_by
+        self.ext = ext
         pass
 
     def cdf(self, img_id):
@@ -483,5 +499,69 @@ class CentroidDist():
     
     def get_descs(self):
         with Parallel(n_jobs = -1) as parallel:
-            self.descs = np.array(parallel(delayed(self.cdf)(i) for i in _getimages(self.datapath))).squeeze()
+            self.descs = np.array(parallel(delayed(self.cdf)(i) for i in _getimages(self.datapath, self.ext))).squeeze()
         pass
+
+
+# # Angular function
+# class Angular():
+#     '''
+#     datapath : string
+#         path of directory where the image data is stored.
+#     n_points : integer, optional
+#         number of points to sample on image contour (default: 100)
+#     scale_by : 'max' or 'avg'
+#         how transform featured to achieve scale invariance. 'max' for scaling with maximum radius. 'avg' for
+#         scaling with average radius.
+#     '''
+#     def __init__(self, datapath, w = 10, n_points = 100, scale_by = 'max') -> None:
+#         self.datapath = datapath
+#         self.n_points = n_points
+#         self.scale_by = scale_by
+#         self.w = w
+#         pass
+
+#     def cdf(self, img_id):
+#         imgpath = os.path.join(self.datapath, img_id)
+#         img = cv2.imread(imgpath, cv2.IMREAD_GRAYSCALE)
+#         _, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+#         img = cv2.bitwise_not(img)
+
+#         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+#         if len(contours) == 1:
+#             contour = contours[0]
+#         else:
+#             contour = max(contours, key=cv2.contourArea)
+#         contour_array = contour[:, 0, :]
+
+#         moments = cv2.moments(img)
+#         x, y = moments['m10']/ moments['m00'], moments['m01']/moments['m00']
+#         dist = cdist(contour_array, np.array([[x,y]]))
+
+#         if self.scale_by == 'max':
+#             dist /= np.max(dist)
+#         elif self.scale_by == 'avg':
+#             dist /= np.mean(dist)
+        
+#         # re-order for rotation invariance
+#         max_ind = dist.argmax()
+#         contour_array_ = np.concatenate([contour_array[max_ind:], contour_array[:max_ind]], axis = 0) #shift curve such that the farthest point becomes the starting point
+#         N = contour_array_.shape[0]
+#         print(N, contour_array_.shape)
+
+#         # compute angle
+#         indw = (np.arange(N) + self.w) % (N - 1)
+#         theta = np.arctan((contour_array_[:, 1] - contour_array_[indw, 1]) /
+#                            (contour_array_[:, 0] - contour_array_[indw, 0] + 1e-15))
+#         theta = np.abs(theta)
+#         phi = theta - theta[0]
+#         psi = phi + (np.pi / (N-1)) * np.arange(N)
+        
+#         psi = psi[np.linspace(0, N - 1, self.n_points).astype(int)]
+        
+#         return psi
+    
+#     def get_descs(self):
+#         with Parallel(n_jobs = -1) as parallel:
+#             self.descs = np.array(parallel(delayed(self.cdf)(i) for i in _getimages(self.datapath))).squeeze()
+#         pass
