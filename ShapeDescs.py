@@ -26,12 +26,16 @@ def _getimages(datapath, ext = '.bmp'):
 
 # Hu moments
 class HuMoments():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    '''
+    """
+    HuMoments extracts Hu invariant moments from binary images.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+    """
     def __init__(self, datapath, ext = '.bmp') -> None:
         self.datapath = datapath
         self.ext = ext
@@ -52,14 +56,31 @@ class HuMoments():
 
 # Zernike moments
 class ZernikeMoments():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    degree : integer, optional
-        Maximum degree to use (default: 8)
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc 
-    '''
+    """
+    Extracts Zernike moments from binary images for shape analysis.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    degree : int, optional
+        Maximum degree of Zernike moments to compute (default: 8).
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    scale_contour(cnt, scale)
+        Scales a contour by a given factor.
+    translate_contour(cnts, cx, cy)
+        Translates a contour to a new centroid.
+    descriptors(img)
+        Computes Zernike moments for a given image.
+    _get_descriptors(img_id)
+        Loads an image and computes its Zernike moments.
+    get_descs()
+        Computes Zernike moments for all images in the dataset.
+    """
     def __init__(self, datapath, degree= 8, ext = '.bmp') -> None:
         self.datapath = datapath
         self.degree = degree
@@ -115,16 +136,27 @@ class ZernikeMoments():
 
 # Shift Invariant Feature Transformation
 class SIFT():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    k : integer, optional
-        Size of global SIFT descriptor (default: 16)
-    kmeans_iter : integer, optional
-        Number of iterations for kmeans used for clustering local SIFT desicriptors (default: 10).
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    '''
+    """
+    Computes global SIFT descriptors for a dataset of binary images using a bag-of-words approach.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    k : int, optional
+        Size of the global SIFT descriptor (number of clusters, default: 16).
+    kmeans_iter : int, optional
+        Number of iterations for k-means clustering (default: 10).
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    sift_keypoints(img_name, n_keys=0)
+        Computes SIFT keypoints and descriptors for a single image.
+    get_descs()
+        Computes global SIFT descriptors for all images in the dataset.
+    """
     def __init__(self, datapath, k = 16, kmeans_iter = 10, ext = '.bmp') -> None:
         self.datapath = datapath
         self.k = k
@@ -162,14 +194,27 @@ class SIFT():
 
 # Elliptic Fourier Descriptors
 class EllipticFourierDesc():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    order : integer, optional
-        The order of Fourier coefficients to calculate (default: 25)
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    '''
+    """
+    Computes Elliptic Fourier Descriptors (EFD) for binary images.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    order : int, optional
+        Order of Fourier coefficients to calculate (default: 25).
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    get_efd(img)
+        Computes EFD coefficients for a given image.
+    _shape_efd(path)
+        Loads an image and computes its EFD.
+    get_descs()
+        Computes EFDs for all images in the dataset.
+    """
     def __init__(self, datapath, order = 25, ext = '.bmp') -> None:
         self.datapath = datapath
         self.order = order
@@ -205,14 +250,35 @@ class EllipticFourierDesc():
 
 # Fourier Descriptors
 class FourierDescriptor():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    num_pairs : integer, optional
-        The number of pair of Fourier coefficients to calculate (default: 20)
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    '''
+    """
+    Computes rotation, scale, and translation invariant Fourier Descriptors for binary images.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    num_pairs : int, optional
+        Number of pairs of Fourier coefficients to calculate (default: 20).
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    get_contour(img)
+        Extracts the contour from a binary image.
+    get_descriptors(contour_array)
+        Computes the Fourier descriptors for a contour.
+    get_trans_invariant(fourier_desc)
+        Makes the descriptors translation invariant.
+    get_scale_invariant(array)
+        Makes the descriptors scale invariant.
+    get_rotation_invariant(array)
+        Makes the descriptors rotation invariant.
+    compute_desc(img_id, rot_invariant=False, r_only=False)
+        Computes the full descriptor for an image.
+    get_descs(rot_invariant=False, r_only=True)
+        Computes descriptors for all images in the dataset.
+    """
     def __init__(self, datapath, num_pairs = 20, ext = '.bmp') -> None:
         self.datapath = datapath
         self.num_pairs = num_pairs
@@ -299,13 +365,39 @@ class FourierDescriptor():
 
 # Shape Context
 class ShapeContext(object):
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    ...
-    '''
+    """
+    Computes Shape Context descriptors for binary images.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    n_contour_points : int, optional
+        Number of contour points to sample (default: 100).
+    nbins_r : int, optional
+        Number of radial bins (default: 5).
+    nbins_theta : int, optional
+        Number of angular bins (default: 12).
+    r_inner : float, optional
+        Inner radius for log-polar binning (default: 0.1250).
+    r_outer : float, optional
+        Outer radius for log-polar binning (default: 2.0).
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    get_contour(img, n_points=None, scale=False)
+        Extracts and optionally resamples the contour from a binary image.
+    compute_description(img_id)
+        Computes the shape context descriptor for a single image.
+    get_matching_cost(P, Q)
+        Computes the matching cost between two shape context descriptors using the Hungarian algorithm.
+    get_fast_matching_cost(P, Q)
+        Computes a fast matching cost using cosine distance.
+    get_descs()
+        Computes shape context descriptors for all images in the dataset.
+    """
     def __init__(self, datapath, n_contour_points = 100, nbins_r=5, nbins_theta=12, r_inner=0.1250, r_outer=2.0, ext = '.bmp'):
         self.datapath = datapath
         # number of radius zones
@@ -320,10 +412,19 @@ class ShapeContext(object):
 
     def _hungarian(self, cost_matrix):
         """
-            Here we are solving task of getting similar points from two paths
-            based on their cost matrixes. 
-            This algorithm has dificulty O(n^3)
-            return total modification cost, indexes of matched points
+        Solves the assignment problem for matching points between two shapes using the Hungarian algorithm.
+
+        Parameters
+        ----------
+        cost_matrix : ndarray
+            Cost matrix between two sets of points.
+
+        Returns
+        -------
+        total : float
+            Total matching cost.
+        indexes : iterator
+            Matched point indices.
         """
         row_ind, col_ind = linear_sum_assignment(cost_matrix)
         total = cost_matrix[row_ind, col_ind].sum()
@@ -377,7 +478,17 @@ class ShapeContext(object):
     
     def get_cosine_dist_matrix(self, P, Q):
         """
-            Recommended as a faster alternative to chi-squared
+        Computes the cosine distance matrix between two sets of shape context descriptors.
+
+        Parameters
+        ----------
+        P, Q : ndarray
+            Shape context descriptors.
+
+        Returns
+        -------
+        ndarray
+            Cosine distance matrix.
         """ 
         P_row_sum = P.sum(axis = 1)[:, np.newaxis]
         Q_row_sum = Q.sum(axis = 1)[:, np.newaxis]
@@ -390,7 +501,17 @@ class ShapeContext(object):
 
     def compute_description(self, img_id):
         """
-          Here we are computing shape context descriptor
+        Computes the shape context descriptor for a single image.
+
+        Parameters
+        ----------
+        img_id : str
+            Image filename.
+
+        Returns
+        -------
+        ndarray
+            Shape context descriptor.
         """
         imgpath = os.path.join(self.datapath, img_id)
         img = cv2.imread(imgpath, cv2.IMREAD_GRAYSCALE)
@@ -433,11 +554,41 @@ class ShapeContext(object):
         return np.array(descriptor)
 
     def get_matching_cost(self, P, Q):
+        """
+        Computes the matching cost between two shape context descriptors using the chi-squared cost.
+
+        Parameters
+        ----------
+        P, Q : ndarray
+            Shape context descriptors.
+
+        Returns
+        -------
+        cost : float
+            Total matching cost.
+        indexes : iterator
+            Matched point indices.
+        """
         C = self.get_cost_matrix(P, Q)
         cost, indexes = self._hungarian(C)
         return cost, indexes
     
     def get_fast_matching_cost(self, P, Q):
+        """
+        Computes a fast matching cost between two shape context descriptors using cosine distance.
+
+        Parameters
+        ----------
+        P, Q : ndarray
+            Shape context descriptors.
+
+        Returns
+        -------
+        cost : float
+            Total matching cost.
+        indexes : iterator
+            Matched point indices.
+        """
         C = self.get_cosine_dist_matrix(P, Q)
         cost, indexes = self._hungarian(C)
         return cost, indexes
@@ -451,22 +602,33 @@ class ShapeContext(object):
 
 # Centroid Distance function
 class CentroidDist():
-    '''
-    datapath : string
-        path of directory where the image data is stored.
-    n_points : integer, optional
-        number of points to sample on image contour (default: 100)
-    scale_by : 'max' or 'avg'
-        how transform featured to achieve scale invariance. 'max' for scaling with maximum radius. 'avg' for
-        scaling with average radius.
-    ext : string
-        to specify the image file extension of shape dataset. For example; '.jpg', '.png', '.bmp' etc
-    '''
+    """
+    Computes the centroid distance function (CDF) for binary images.
+
+    Parameters
+    ----------
+    datapath : str
+        Path to the directory containing the image dataset.
+    n_points : int, optional
+        Number of points to sample on the image contour (default: 100).
+    scale_by : {'max', 'avg', 'none'}, optional
+        How to scale the distances for scale invariance. 'max' for maximum radius, 'avg' for average radius, 'none' for no scaling.
+    ext : str, optional
+        File extension of the images to process (default: '.bmp').
+
+    Methods
+    -------
+    cdf(img_id)
+        Computes the centroid distance function for a single image.
+    get_descs()
+        Computes centroid distance functions for all images in the dataset.
+    """
     def __init__(self, datapath, n_points = 100, scale_by = 'max', ext = '.bmp') -> None:
         self.datapath = datapath
         self.n_points = n_points
         self.scale_by = scale_by
         self.ext = ext
+        assert self.scale_by in ['max', 'avg', 'none'], f"Invalid scale_by {scale_by}. It has to be one of 'max', 'avg', or 'none'."
         pass
 
     def cdf(self, img_id):
@@ -505,50 +667,62 @@ class CentroidDist():
 
 # # Angular function
 # class Angular():
-#     '''
-#     datapath : string
-#         path of directory where the image data is stored.
-#     n_points : integer, optional
-#         number of points to sample on image contour (default: 100)
-#     scale_by : 'max' or 'avg'
-#         how transform featured to achieve scale invariance. 'max' for scaling with maximum radius. 'avg' for
-#         scaling with average radius.
-#     '''
+#     """
+#     Computes the angular function descriptor for binary images.
+#
+#     Parameters
+#     ----------
+#     datapath : str
+#         Path to the directory containing the image dataset.
+#     w : int, optional
+#         Window size for angle computation (default: 10).
+#     n_points : int, optional
+#         Number of points to sample on the image contour (default: 100).
+#     scale_by : {'max', 'avg'}, optional
+#         How to scale the distances for scale invariance.
+#
+#     Methods
+#     -------
+#     cdf(img_id)
+#         Computes the angular function for a single image.
+#     get_descs()
+#         Computes angular functions for all images in the dataset.
+#     """
 #     def __init__(self, datapath, w = 10, n_points = 100, scale_by = 'max') -> None:
 #         self.datapath = datapath
 #         self.n_points = n_points
 #         self.scale_by = scale_by
 #         self.w = w
 #         pass
-
+#
 #     def cdf(self, img_id):
 #         imgpath = os.path.join(self.datapath, img_id)
 #         img = cv2.imread(imgpath, cv2.IMREAD_GRAYSCALE)
 #         _, img = cv2.threshold(img,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
 #         img = cv2.bitwise_not(img)
-
+#
 #         contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 #         if len(contours) == 1:
 #             contour = contours[0]
 #         else:
 #             contour = max(contours, key=cv2.contourArea)
 #         contour_array = contour[:, 0, :]
-
+#
 #         moments = cv2.moments(img)
 #         x, y = moments['m10']/ moments['m00'], moments['m01']/moments['m00']
 #         dist = cdist(contour_array, np.array([[x,y]]))
-
+#
 #         if self.scale_by == 'max':
 #             dist /= np.max(dist)
 #         elif self.scale_by == 'avg':
 #             dist /= np.mean(dist)
-        
+#         
 #         # re-order for rotation invariance
 #         max_ind = dist.argmax()
 #         contour_array_ = np.concatenate([contour_array[max_ind:], contour_array[:max_ind]], axis = 0) #shift curve such that the farthest point becomes the starting point
 #         N = contour_array_.shape[0]
 #         print(N, contour_array_.shape)
-
+#
 #         # compute angle
 #         indw = (np.arange(N) + self.w) % (N - 1)
 #         theta = np.arctan((contour_array_[:, 1] - contour_array_[indw, 1]) /
@@ -556,11 +730,11 @@ class CentroidDist():
 #         theta = np.abs(theta)
 #         phi = theta - theta[0]
 #         psi = phi + (np.pi / (N-1)) * np.arange(N)
-        
+#         
 #         psi = psi[np.linspace(0, N - 1, self.n_points).astype(int)]
-        
+#         
 #         return psi
-    
+#     
 #     def get_descs(self):
 #         with Parallel(n_jobs = -1) as parallel:
 #             self.descs = np.array(parallel(delayed(self.cdf)(i) for i in _getimages(self.datapath))).squeeze()
