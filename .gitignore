@@ -1,6 +1,6 @@
 __pycache__/
 *.py[cod]
-*.ipynb
+img-gen.ipynb
 
 # Virtual envs
 .venv/
