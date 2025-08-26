@@ -1,0 +1,11 @@
+{
+  "datapath": "C:/Users/eakew/OneDrive - Trinity College Dublin/Documents/Research Work/ShapeAnalysisForMgPowder/316L-reused/316L-reused/Individual Particle Images",
+  "dict_path": "O2VAE/O2VAE_64latents_1Beta_BCE.pt",
+  "img_size": 128,
+  "ext": ".bmp",
+  "split": [0.7, 0.15],
+  "batch_size": 64,
+  "latent_dim": 64,
+  "enc_channels": [6, 9, 12, 12, 19, 25],
+  "enc_last_pooling": "pointwise_adaptive_avg_pool"
+}
