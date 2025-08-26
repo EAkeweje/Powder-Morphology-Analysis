@@ -1,0 +1,7 @@
+{
+  "datapath": "C:/Users/eakew/OneDrive - Trinity College Dublin/Documents/Research Work/ShapeAnalysisForMgPowder/316L-reused/316L-reused/Individual Particle Images",
+  "img_size": 128,
+  "ext": ".bmp",
+  "split": [0.7, 0.15],
+  "batch_size": 64
+}

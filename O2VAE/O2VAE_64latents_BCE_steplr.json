@@ -1,0 +1,22 @@
+{
+  "epochs": 200,
+  "optimizer": "Adam",
+  "lr": 1e-3,
+  "beta1": 0.5,
+  "weight_decay": 0.5,
+  "beta2": 0.9,
+  "SGD_momentum": 0,
+  "scheduling": "step_lr",
+  "dict_path": "O2VAE/O2VAE_64latents_1Beta_BCE.pt",
+  "max_no_save_run": 20,
+  "alignment": true,
+  "recon_loss_fun": "bce_logit",
+  "model_type": "vae",
+  "img_size": 128,
+  "beta": 1,
+  "accum_steps": 16,
+  "enc_channels": [6, 9, 12, 12, 19, 25],
+  "latent_dim": 64,
+  "last_pooling": "pointwise_adaptive_avg_pool",
+  "use_pretrained": true
+}
