@@ -193,9 +193,9 @@ if __name__ == "__main__":
     np.float = float
 
     parser = argparse.ArgumentParser(description='Train O2VAE model')
-    parser.add_argument('-tc', '--training_config', type = str,
+    parser.add_argument('-tc', '--training_config', type = str, default= 'training_config.json',
                         help= 'Path to triaining config file in JSON format.')
-    parser.add_argument('-dc', '--data_config', type = str, default= 'O2VAE_data_config.json',
+    parser.add_argument('-dc', '--data_config', type = str, default= 'data_config.json',
                         help = 'Path to data config file in JSON format.')
     args = parser.parse_args()
 
