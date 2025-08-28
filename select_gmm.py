@@ -23,9 +23,9 @@ from joblib import Parallel, delayed
 
 def gmm_analysis(X, ks = range(2,12)):
     X = X.astype(np.float64)
-    if X.shape[1] > 100:
+    if X.shape[1] > 50:
         pca = True
-        X_Transfrom = PCA(n_components= 10)
+        X_Transfrom = PCA(n_components= 20)
         X_r = X_Transfrom.fit_transform(X)
         X_r.shape
     else:
@@ -35,7 +35,7 @@ def gmm_analysis(X, ks = range(2,12)):
     BICs, AICs = [], []
     labels, dbs = [], []
     for k in ks:
-        gm = GaussianMixture(k, covariance_type= 'diag', n_init= 5) # if shape embedding is high dimensionsal (say > 50), set covariance_type = 'diag' to speed up.
+        gm = GaussianMixture(k, covariance_type= 'full', n_init= 5) 
         if pca:
             gm.fit(X_r)
             BICs.append(gm.bic(X_r))
@@ -74,10 +74,11 @@ def gmm_analysis_parallel(
     k_min=2,
     k_max=11,
     n_jobs=-1,
-    covariance_type='diag',
+    covariance_type='full',
+    init_params="k-means++",
     n_init=5,
-    pca_dim_threshold=100,
-    pca_components=10,
+    pca_dim_threshold=50,
+    pca_components=20,
     random_state=None,
     backend='loky',   # 'loky' (processes) for CPU-bound; 'threading' for I/O-bound
     verbose=0
@@ -99,6 +100,7 @@ def gmm_analysis_parallel(
         gm = GaussianMixture(
             n_components=k,
             covariance_type=covariance_type,
+            init_params= init_params,
             n_init=n_init,
             random_state=random_state
         )

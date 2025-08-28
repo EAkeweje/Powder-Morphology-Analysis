@@ -17,6 +17,6 @@
   "accum_steps": 16,
   "enc_channels": [6, 9, 12, 12, 19, 25],
   "latent_dim": 64,
-  "last_pooling": "pointwise_adaptive_avg_pool",
+  "last_pooling": "pointwise_adaptive_max_pool",
   "use_pretrained": true
 }

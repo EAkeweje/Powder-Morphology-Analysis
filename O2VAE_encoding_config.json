@@ -7,5 +7,5 @@
   "batch_size": 64,
   "latent_dim": 64,
   "enc_channels": [6, 9, 12, 12, 19, 25],
-  "enc_last_pooling": "pointwise_adaptive_avg_pool"
+  "enc_last_pooling": "pointwise_adaptive_max_pool"
 }
