@@ -1,6 +1,8 @@
 __pycache__/
 *.py[cod]
+
 img-gen.ipynb
+GPmix_labels.npy
 
 # Virtual envs
 .venv/
