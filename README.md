@@ -1,2 +1,2 @@
 # Usage
-Refer to the notebook: [Model selection](Model%20selection.ipynb).
+Refer to the [Tutorial notebook](Tutorial.ipynb).
