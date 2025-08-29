@@ -4,6 +4,7 @@ img-gen.ipynb
 
 # Virtual envs
 .venv/
+.venv37/
 
 #OS / IDE
 desktop.ini

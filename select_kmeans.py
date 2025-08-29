@@ -8,6 +8,7 @@ Otherwise, import the `silhouette_analysis`function from this module and call it
 (not path to the feature array) as a parameter.)
 """
 
+import os
 import math
 import argparse
 import numpy as np
@@ -71,28 +72,32 @@ def _fit_eval_one_k(
 
 def silhouette_analysis_parallel(
     X,
-    ks=range(2, 12),
+    k_min = 2,
+    k_max = 12,
     *,
-    n_jobs=-1,
+    n_jobs=min(4, os.cpu_count() or 1),
     n_init=5,
     sample_frac=0.1,
     random_state=42
 ):
     """
     Parallelized version of silhouette_analysis.
-    
+
     Parameters
     ----------
     X : array-like, shape (n_samples, n_features)
-    ks : iterable of ints
-        Candidate numbers of clusters to evaluate.
-    n_jobs : int
-        Joblib parallelism. -1 uses all cores.
-    n_init : int
-        KMeans n_init.
-    sample_frac : float
+        Feature array to cluster.
+    k_min : int, default=2
+        Minimum number of clusters to evaluate.
+    k_max : int, default=12
+        One above the maximum number of clusters to evaluate (exclusive).
+    n_jobs : int, default=min(4, os.cpu_count() or 1)
+        Number of parallel jobs to run. Uses up to 4 or available CPUs.
+    n_init : int, default=5
+        Number of KMeans initializations to perform.
+    sample_frac : float, default=0.1
         Fraction for stratified sampling used in silhouette plots.
-    random_state : int
+    random_state : int, default=42
         Random seed for reproducibility.
 
     Returns
@@ -103,6 +108,7 @@ def silhouette_analysis_parallel(
         Davies–Bouldin scores for each k, ordered by ks.
     """
     print("Starting parallel K-means clustering...")
+    ks = range(k_min, k_max + 1)
     # Compute all fits in parallel (use separate processes to avoid GIL & avoid MPL issues)
     results = Parallel(n_jobs=n_jobs, prefer="processes")(
         delayed(_fit_eval_one_k)(

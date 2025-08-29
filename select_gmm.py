@@ -8,7 +8,7 @@ Otherwise, import the `gmm_analysis` function from this module and call it with 
 (not path to the feature array) as a parameter.)
 """
 
-
+import os
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -73,7 +73,7 @@ def gmm_analysis_parallel(
     X,
     k_min=2,
     k_max=11,
-    n_jobs=-1,
+    n_jobs= min(4, os.cpu_count() or 1),
     covariance_type='full',
     init_params="k-means++",
     n_init=5,
@@ -83,6 +83,52 @@ def gmm_analysis_parallel(
     backend='loky',   # 'loky' (processes) for CPU-bound; 'threading' for I/O-bound
     verbose=0
 ):  
+    """
+    Performs parallel Gaussian Mixture Model (GMM) clustering analysis over a range of cluster numbers (K), 
+    evaluating each model using BIC, AIC, and Davies–Bouldin scores, with optional PCA dimensionality reduction.
+    
+    Parameters
+    ----------
+    X : np.ndarray, shape (n_samples, n_features)
+        Input data matrix to cluster.
+    k_min : int, default=2
+        Minimum number of clusters (inclusive) to evaluate.
+    k_max : int, default=11
+        Maximum number of clusters (inclusive) to evaluate.
+    n_jobs : int, default=min(4, os.cpu_count() or 1)
+        Number of parallel jobs to run. Defaults to up to 4 or the number of CPUs.
+    covariance_type : {'full', 'tied', 'diag', 'spherical'}, default='full'
+        Type of covariance parameters to use for GMM.
+    init_params : {'k-means++', 'random'}, default='k-means++'
+        Method used to initialize the weights, the means and the precisions.
+    n_init : int, default=5
+        Number of initializations to perform for each GMM fit.
+    pca_dim_threshold : int, default=50
+        If the number of features exceeds this threshold, PCA is applied before clustering.
+    pca_components : int, default=20
+        Number of PCA components to retain if PCA is applied.
+    random_state : int, RandomState instance or None, default=None
+        Random seed for reproducibility.
+    backend : {'loky', 'threading'}, default='loky'
+        Parallelization backend for joblib. 'loky' is recommended for CPU-bound tasks.
+    verbose : int, default=0
+        Verbosity level. If >0, prints progress and metrics for each K.
+    
+    Returns
+    -------
+    labels_list : list of np.ndarray
+        List of cluster label arrays, one for each K in the range [k_min, k_max].
+    dbs : list of float
+        List of Davies–Bouldin scores for each clustering solution.
+    
+    Notes
+    -----
+    - For high-dimensional data (features > `pca_dim_threshold`), PCA is applied before clustering.
+    - For each K, the function fits a GMM, computes BIC, AIC, and Davies–Bouldin scores, and collects the results.
+    - Plots the differences in BIC and AIC as K increases, and visualizes the four best clusterings (by Davies–Bouldin score).
+    - Uses parallel processing to speed up model fitting across different K values.
+    """
+
     X = X.astype(np.float64)
     # Decide whether to use PCA and prepare the matrix used for fitting
     if X.shape[1] > pca_dim_threshold:
@@ -129,8 +175,8 @@ def gmm_analysis_parallel(
         dBIC = - np.array(BICs[1:]) + np.array(BICs[:-1])
         dAIC = - np.array(AICs[1:]) + np.array(AICs[:-1])
         # x-axis should be K from the second value onward (e.g., 3..12 in your plot)
-        plt.plot(range(ks[1], ks[-1] + 1), dBIC, label='$BIC_K - BIC_{K-1}$')
-        plt.plot(range(ks[1], ks[-1] + 1), dAIC, '--', label='$AIC_K - AIC_{K-1}$')
+        plt.plot(range(ks[1], ks[-1] + 1), dBIC, label='$BIC_{K-1} - BIC_K$')
+        plt.plot(range(ks[1], ks[-1] + 1), dAIC, '--', label='$AIC_{K-1} - AIC_K$')
         plt.xlabel('K')
         plt.grid(True)
         plt.legend()

@@ -20,9 +20,14 @@ from ShapeDescs import CentroidDist
 from utils import plot_clustering_fd, order_by_size
 
 
-def cluster(datapath):
+def cluster_cdfs(datapath, ext = 'bmp'):
+    """
+    args:
+        datapath (str): Path to powder image dataset.
+        ext (str): file extension of powder images. Default = '.bmp'
+    """
     # Extracting CDFs from the dataset
-    CDF = CentroidDist(datapath = datapath, n_points = 200, scale_by= 'max', ext = 'bmp')
+    CDF = CentroidDist(datapath = datapath, n_points = 200, scale_by= 'max', ext = ext)
     CDF.get_descs()
     cdf_features = CDF.descs
     #get representative samples
@@ -41,8 +46,8 @@ def cluster(datapath):
     unigmms.fit_gmms(coeffs)
     lbs = unigmms.get_clustering(weighted_sum= False)
     ## plot the clustering of representative samples
-    plot_clustering_fd(sm_reps, lbs, 25)
-    plt.show()
+    # plot_clustering_fd(sm_reps, lbs, 25)
+    # plt.show()
 
     # Full clustering
     ## Nearest Centroid classifier for full clustering
@@ -67,4 +72,4 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--datapath', type=str,
                                 help='Path to the dataset containing grey-level images of powder samples.')
     args = parser.parse_args()
-    cluster(args.datapath)
+    cluster_cdfs(args.datapath)

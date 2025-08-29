@@ -1,3 +1,24 @@
+"""
+The implementations of shape descriptors are in the py scrpit `ShapeDescs.py`. The descriptors implemented are:
+- Hu Moments (`HuMoments`),
+- Zernike Moments (`ZernikeMoments`),
+- SIFT (`SIFT`),
+- Fourier Descriptor (`FourierDescriptor`),
+- Elliptical Fourier Descriptor (`EllipticFourierDesc`),
+- Shape Context (`ShapeContext`), and
+- Centroid Distance Function (`CentroidDist`).
+
+Usage
+------
+The usage of the implemented shape descriptors are quite similar. 
+- First create the shape descriptor object. `DescObj = <DescriptorClass>(datapath, ext)`. Aside `datapath` and `ext`, which are the path to the directory where the dataset is stored and the image file extension of the shape dataset, some of the shape descriptors have other optional parameter. Use `?<DescriptorClass>` to check for the optional parameter.
+- Next, compute the shape descriptor features using the method `get_descs()`.
+- The computed shape descriptors are stored in the attribute `descs`.
+
+Now any multivariate clustering method can be applied to the features obtained.
+"""
+
+
 import os
 import imutils
 from tqdm import tqdm
