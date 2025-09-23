@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 
 img-gen.ipynb
-GPmix_labels.npy
+*_labels.npy
 
 # Virtual envs
 .venv/
@@ -10,3 +10,6 @@ GPmix_labels.npy
 
 #OS / IDE
 desktop.ini
+
+Graphical Abstract.png
+GPmix_labels.npy

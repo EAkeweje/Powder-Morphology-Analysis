@@ -26,20 +26,17 @@ import itertools
 from joblib import Parallel, delayed
 
 import numpy as np
-import matplotlib.pyplot as plt
 import cv2
 import mahotas
 import math
 from skimage.measure import *
 from scipy.fft import fft
-from skimage.transform import radon
 from scipy.cluster.vq import kmeans,vq
 from pyefd import elliptic_fourier_descriptors
 from sklearn.cluster import *
-from sklearn.metrics import silhouette_score
 from scipy.optimize import brent
 from scipy.optimize import linear_sum_assignment
-from scipy.spatial.distance import cdist, cosine
+from scipy.spatial.distance import cdist
 
 
 def _getimages(datapath, ext = '.bmp'):
@@ -279,7 +276,7 @@ class FourierDescriptor():
     datapath : str
         Path to the directory containing the image dataset.
     num_pairs : int, optional
-        Number of pairs of Fourier coefficients to calculate (default: 20).
+        Number of pairs of Fourier coefficients to calculate (default: 5).
     ext : str, optional
         File extension of the images to process (default: '.bmp').
 
@@ -300,7 +297,7 @@ class FourierDescriptor():
     get_descs(rot_invariant=False, r_only=True)
         Computes descriptors for all images in the dataset.
     """
-    def __init__(self, datapath, num_pairs = 20, ext = '.bmp') -> None:
+    def __init__(self, datapath, num_pairs = 5, ext = '.bmp') -> None:
         self.datapath = datapath
         self.num_pairs = num_pairs
         self.ext = ext

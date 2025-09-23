@@ -39,8 +39,8 @@ def cluster_cdfs(datapath, ext = 'bmp'):
     sm_reps = sm.fit(reps_)
     ## estimate number of clusters
     n = estimate_nclusters(sm_reps, np.arange(2,20))
-    ## GPmix clustering
-    proj = GPmix.Projector(basis_type= 'rl-fpc', n_proj= 12)
+    ## GPmix clustering. The configuration of GPmix can be altered if necessary. See gpmix.readthedocs.io for more info
+    proj = GPmix.Projector(basis_type= 'ou', n_proj= 12)
     coeffs = proj.fit(sm_reps)
     unigmms = GPmix.UniGaussianMixtureEnsemble(n_clusters= n, init_method= 'k-means++')
     unigmms.fit_gmms(coeffs)
